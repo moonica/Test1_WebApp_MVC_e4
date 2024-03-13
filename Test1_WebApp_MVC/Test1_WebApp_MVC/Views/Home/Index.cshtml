@@ -2,7 +2,9 @@
     ViewData["Title"] = "Manage User";
 }
 
+@model User
+
 <h3>Add New User</h3>
 <div id="tabAdd" class="tab-pane fade in active">
-    <partial name="_AddUser.cshtml" />
+    <partial name="_EditUser.cshtml" model='new UserViewModel() { user = Model, actionName = "CreateUser", controllerName = "Home" }' />
 </div>

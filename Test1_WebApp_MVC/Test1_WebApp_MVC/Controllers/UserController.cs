@@ -22,13 +22,20 @@ namespace Test1_WebApp_MVC.Controllers
             ViewData.Reset("btnList");
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string userAction = null)
         {
-            ViewData.Upsert("activeBtn", "btnList");
+            var vm = new UserViewModel<List<User>>() { actionName = userAction };
 
-            var users = _dataService.GetUsers();
+            if ((userAction ?? "ListUsers") == "ListUsers")
+            {
+                ViewData.Upsert("activeBtn", "btnList");
 
-            return View("Index", users);
+                vm.userData = _dataService.GetUsers();
+
+                return View("Index", vm);
+            }
+
+            return View("Index");
         }
 
         public ActionResult DeleteUser(User userToDelete)
@@ -56,7 +63,27 @@ namespace Test1_WebApp_MVC.Controllers
                 ViewData.Upsert("userMsg", $"User {userToDelete.Id} could not be deleted");
                 ViewData.Upsert("userSuccess", false);
             }
-            return View("Index");
+
+            //TODO: keep users in memory (Viewdata?) to avoid refetching. This is cheap enough for an XML file but not for db calls e.g.
+            var users = _dataService.GetUsers();
+
+            return View("Index", users);
+        }
+
+        public ActionResult EditUser(User user)
+        {
+            //TODO: validation
+
+            if (_dataService.UpdateUser(user))
+            {
+                ViewData.Set(true, "User Updated");
+                return View("Index");
+            }
+            else
+            {
+                _logger.LogWarning("Could not update user", user);
+                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
         }
     }
 }

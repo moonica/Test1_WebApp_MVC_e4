@@ -24,7 +24,7 @@ namespace Test1_WebApp_MVC.Controllers
         {
             ViewData.Upsert("activeBtn", "btnAdd");
 
-            return View();
+            return View(new UserViewModel<User>() { actionName = "CreateUser", controllerName="Home", userData = new User()});
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -36,14 +36,14 @@ namespace Test1_WebApp_MVC.Controllers
 
         #region USER OPERATIONS
         
-        public ActionResult CreateUser(User user)
+        public ActionResult CreateUser(UserViewModel<User> userViewModel)
         {
             //TODO: validation
 
-            if (_dataService.CreateUser(user))
+            if (_dataService.CreateUser(userViewModel.userData))
             {
                 ViewData.Set(true, "User created");
-                return View("Index", new User());
+                return View("Index", new UserViewModel<User>() { actionName = "CreateUser", controllerName = "Home", userData = new User() });
 
                 //TODO: get business requirement if they want to input many at a time, and stay on the Add page; or go to the List page to see the new value
                 //If we redirect, add focus on the newly inserted record and scroll down
@@ -51,6 +51,7 @@ namespace Test1_WebApp_MVC.Controllers
             }
             else
             {
+                _logger.LogWarning("Could not create user", userViewModel);
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
 

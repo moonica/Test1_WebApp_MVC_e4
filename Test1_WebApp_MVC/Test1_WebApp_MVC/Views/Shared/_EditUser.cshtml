@@ -1,0 +1,29 @@
+﻿@using Test1_WebApp_MVC.Models;
+@using Test1_WebApp_MVC.Services;
+
+@model UserViewModel<User>
+
+<div>
+    @using (Html.BeginForm(Model.actionName, Model.controllerName, FormMethod.Post))
+    {
+        <form>
+            <div class="">
+                <label for="inputName" class="col-12 col-md-2 text-right">First Name</label>
+                @Html.TextBoxFor(u => u.userData.Name, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputName", @required = "required", autofocus = "auto", @placeholder = "First Name..." })
+            </div>
+
+            <div class="">
+                <label for="inputSurname" class="col-12 col-md-2 text-right">Surname</label>
+                @Html.TextBoxFor(u => u.userData.Surname, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputSurname", @required = "required", @placeholder = "Surname..." })
+            </div>
+
+            <div class="">
+                <label for="inputCell" class="col-12 col-md-2 text-right">Cellphone Number</label>
+                @Html.TextBoxFor(u => u.userData.CellNumber, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputCell", @required = "required", @placeholder = @Utils.VALID_PHONE_EXAMPLE })
+            </div>
+
+            <button class="btn btn-primary pull-right" type="submit">Submit</button>
+        </form>
+    }
+</div>
+

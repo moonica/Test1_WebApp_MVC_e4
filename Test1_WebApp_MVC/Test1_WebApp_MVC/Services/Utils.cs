@@ -58,6 +58,8 @@ namespace Test1_WebApp_MVC.Services
 
         public static void Reset(this ViewDataDictionary viewData, string activeButtonId = null)
         {
+            //TODO: variabelize these string identifiers
+
             if (!string.IsNullOrEmpty(activeButtonId))
                 viewData.Upsert("activeBtn", activeButtonId);
 

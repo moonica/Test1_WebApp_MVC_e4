@@ -24,13 +24,12 @@
                     <td>@user.Surname</td>
                     <td>@user.CellNumber</td>
                     <td class="text-center">
-                        <span class="btn btn-info" @*onclick="location.href='@Url.Action("Index")'"*@>
-                            <i class="fa-solid fa-pen-to-square"></i>
+                        <span class="btn alert-info" onclick="location.href='@Url.Action("EditUser", @user)'">
+                            <i class="fa fa-solid fa-pen-to-square"></i>
                         </span>
                     </td>
                     <td class="text-center">
-                        <span class="btn btn-info" onclick="confirmDelete(@user.Id, '@Url.Action("DeleteUser", new User() { Id = @user.Id })')">
-                            @*location.href='@Url.Action("DeleteUser", new User() { Id = @user.Id })'">*@
+                        <span class="btn alert-danger" onclick="confirmDelete(@user.Id, '@Url.Action("DeleteUser", new User() { Id = @user.Id })')">
                             <i class="fa-solid fa-trash-can"></i>
                         </span>
                     </td>

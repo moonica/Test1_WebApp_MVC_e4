@@ -2,7 +2,20 @@
     ViewData["Title"] = "Manage Users";
 }
 
-<h3>List of Users</h3>
-<div id="tabList" class="tab-pane fade in active">
-    <partial name="_ListUsers.cshtml" />
-</div>
+@model UserViewModel<List<User>>
+
+@if (Model.actionName == "ListUsers")
+{
+    <h3>List of Users</h3>
+    <div id="tabList" class="tab-pane fade in active">
+        <partial name="_ListUsers.cshtml" model="Model?.userData"/>
+    </div>
+}
+
+@if (Model.actionName == "EditUser")
+{
+    <h3>Edit User</h3>
+    <div id="tabList" class="tab-pane fade in active">
+        <partial name="_EditUser.cshtml" model='new UserViewModel<User>() { userData = Model?.userData?.FirstOrDefault(), actionName = "UpdateUser", controllerName = "User" }'/>
+    </div>
+}
