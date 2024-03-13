@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Test1_WebApp_MVC.Services;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -27,7 +29,8 @@
                 <label>
                     @ViewData["userMsg"]
                 </label>
-                <label class="pull-right btn-close" onclick=""> <!-- TO DO -->
+                <label class="pull-right btn btn-close btn-toast" onclick="location.href='@Url.Action("Index")'">
+                    <!-- TO DO -->
                     X
                 </label>
             </div>

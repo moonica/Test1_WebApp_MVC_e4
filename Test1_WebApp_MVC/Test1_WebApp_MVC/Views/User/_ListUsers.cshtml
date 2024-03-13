@@ -5,7 +5,6 @@
 
 @if (Model is not null)
 {
-    int i = 0;
     <div>
         <table class="table table-bordered table-responsive table-hover">
             <tr>
@@ -17,7 +16,7 @@
             @foreach (var user in Model)
             {
                 <tr>
-                    <td>@(i++)</td>
+                    <td>@user.Id</td>
                     <td>@user.Name</td>
                     <td>@user.Surname</td>
                     <td>@user.CellNumber</td>

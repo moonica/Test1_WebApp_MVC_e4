@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace Test1_WebApp_MVC.Services
@@ -72,6 +73,7 @@ namespace Test1_WebApp_MVC.Services
             viewData.Upsert("userMsg", message);
             viewData.Upsert("userSuccess", success);
         }
+
         #endregion EXTENSION UTILS
     }
 }
