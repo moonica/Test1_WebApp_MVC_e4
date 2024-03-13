@@ -6,7 +6,6 @@
 <div>
     @using (Html.BeginForm("CreateUser", "Home", FormMethod.Post))
     {
-
         <form>
             <div class="">
                 <label for="inputName" class="col-12 col-md-2 text-right">First Name</label>
@@ -23,7 +22,7 @@
                 @Html.TextBoxFor(u => u.CellNumber, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputCell", @required = "required", @placeholder = @Utils.VALID_PHONE_EXAMPLE })
             </div>
 
-            <button class="btn btn-lg btn-primary" type="submit">Submit</button>
+            <button class="btn btn-primary pull-right" type="submit">Submit</button>
         </form>
     }
 </div>
