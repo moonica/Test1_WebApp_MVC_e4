@@ -30,7 +30,7 @@
                     @ViewData["userMsg"]
                 </label>
                 <label class="pull-right btn btn-close btn-toast" onclick="location.href='@Url.Action("Index")'">
-                    <!-- TO DO -->
+                    <!-- Navigating back to Index calls the constructor, which resets the ViewData for success and user message -->
                     X
                 </label>
             </div>

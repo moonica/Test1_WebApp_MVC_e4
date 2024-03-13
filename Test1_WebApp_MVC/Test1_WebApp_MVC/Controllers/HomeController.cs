@@ -42,10 +42,17 @@ namespace Test1_WebApp_MVC.Controllers
             if (_dataService.CreateUser(user))
             {
                 ViewData.Set(true, "User created");
-                return View("Index");
+                return View("Index", new User());
+                
+                //TODO: get business requirement if they want to input many at a time, and stay on the Add page; or go to the List page to see the new value
+                //If we redirect, add focus on the newly inserted record and scroll down
+                //return RedirectToAction("Index", "User");
             }
             else
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+
+            //TODO: investigate why the active button class is not correctly applied to the "Add User" nav button when the user is done being added.
+            //TODO: clear form fields on submit; passing in a new blank user as a model for the view isn't doing the trick
         }
 
         #endregion USER OPERATIONS
