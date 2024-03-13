@@ -49,6 +49,29 @@ namespace Test1_WebApp_MVC.Services
                 viewData?.Add(key, value);
         }
 
+        public static void NullSafeRemove(this ViewDataDictionary viewData, string key)
+        {
+            if (viewData?.ContainsKey(key) ?? false)
+                viewData.Remove(key);
+        }
+
+        public static void Reset(this ViewDataDictionary viewData, string activeButtonId = null)
+        {
+            if (!string.IsNullOrEmpty(activeButtonId))
+                viewData.Upsert("activeBtn", activeButtonId);
+
+            viewData.NullSafeRemove("userMsg");
+            viewData.NullSafeRemove("userSuccess");
+        }
+
+        public static void Set(this ViewDataDictionary viewData, bool success, string message, string activeButtonId = null)
+        {
+            if (!string.IsNullOrEmpty(activeButtonId))
+                viewData.Upsert("activeBtn", activeButtonId);
+
+            viewData.Upsert("userMsg", message);
+            viewData.Upsert("userSuccess", success);
+        }
         #endregion EXTENSION UTILS
     }
 }

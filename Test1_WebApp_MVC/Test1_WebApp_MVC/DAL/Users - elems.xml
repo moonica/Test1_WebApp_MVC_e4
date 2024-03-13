@@ -24,10 +24,4 @@
     <Surname>Diederiks</Surname>
     <CellNumber>04444</CellNumber>
   </User>
-  <User>
-    <Id>5</Id>
-    <Name>Eloise</Name>
-    <Surname>Ellis</Surname>
-    <CellNumber>555</CellNumber>
-  </User>
 </ArrayOfUser>

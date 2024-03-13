@@ -24,22 +24,15 @@ namespace Test1_WebApp_MVC.DAL
                 if (!validateUser(newUser))
                     return false;
 
+                var nextId = (getMaxId() ?? -1) + 1;
+
                 XDocument xmlFile = XDocument.Load(_fileName);
-                var query = from c in xmlFile.Elements("ArrayOfUser").Elements("User")
-                            select c;
+                var newElem = getUserXElement(newUser, nextId);
 
-                newUser.Id = (getMaxId(query) ?? 0) + 1;
+                xmlFile?.Element("ArrayOfUser")?.LastNode?.AddAfterSelf(newElem);
 
-                if (query?.Any() ?? false)
-                    query?.Last().AddAfterSelf(newUser);
-                else
-                {
-                    if (query is not null)
-                        query.ToList().Add(new XElement("User", newUser));
-                    //TODO: create file with new node if query is null
-                }
-                xmlFile.Elements("ArrayOfUser").Elements("User").Append(new XElement("User", newUser));
                 xmlFile.Save(_fileName);
+
                 return true;
             }
             catch (Exception ex)
@@ -49,32 +42,31 @@ namespace Test1_WebApp_MVC.DAL
             }
         }
 
-
         public bool UpdateUser(User existingUser)
         {
-            try
-            {
-                if (!validateUser(existingUser))
-                    return false;
+            //try
+            //{
+            //    if (!validateUser(existingUser))
+            //        return false;
 
-                XDocument xmlFile = XDocument.Load(_fileName);
-                var query = from c in xmlFile.Elements("ArrayOfUser").Elements("User").Where(x => x.Attribute("Id")?.ToString() == existingUser.Id.ToString())
-                            select c;
-                foreach (XElement userNode in query)
-                {
-                    if (userNode == null)
-                        continue;
+            //    XDocument xmlFile = XDocument.Load(_fileName);
+            //    var query = from c in xmlFile.Elements("ArrayOfUser").Elements("User").Where(x => x.Attribute("Id")?.ToString() == existingUser.Id.ToString())
+            //                select c;
+            //    foreach (XElement userNode in query)
+            //    {
+            //        if (userNode == null)
+            //            continue;
 
-                    populateNode(userNode, existingUser, true);
-                }
-                xmlFile.Save(_fileName);
+            //        populateNode(userNode, existingUser, true);
+            //    }
+            //    xmlFile.Save(_fileName);
                 return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return false;
-            }
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex.Message);
+            //    return false;
+            //}
         }
 
         public bool DeleteUser(int userIdToDelete)
@@ -139,12 +131,19 @@ namespace Test1_WebApp_MVC.DAL
         {
             var idStrElements = query?.Select(x => x?.Element("Id")?.Value ?? "-1");
             var idElements = new List<int>();
-            idStrElements?.ToList()?.ForEach(e => { 
+            idStrElements?.ToList()?.ForEach(e =>
+            {
                 if (int.TryParse(e, out int id))
                     idElements.Add(id);
             });
 
             return idElements?.Max();
+        }
+
+        private int? getMaxId()
+        {
+            var users = GetUsers();
+            return users?.MaxBy(u => u.Id)?.Id;
         }
 
         private bool validateUser(User newUser)
@@ -189,24 +188,16 @@ namespace Test1_WebApp_MVC.DAL
             userNode.Attribute(attrName).Value = coalesce ? (newValue ?? userNode.Attribute(attrName).Value) : newValue;
         }
 
+        private XElement getUserXElement(User newUser, int id)
+        {
+            return new XElement("User",
+                new XElement(nameof(newUser.Id), id),
+                new XElement(nameof(newUser.Name), newUser.Name),
+                new XElement(nameof(newUser.Surname), newUser.Surname),
+                new XElement(nameof(newUser.CellNumber), newUser.CellNumber)
+            );
+        }
+
         #endregion PRIVATE METHODS
     }
 }
-
-
-/*
-var patient = new Patient()
-{
-    ID = 232323,
-    FirstName = "John",
-    LastName = "Doe",
-    Birthday = new DateTime(1990, 12, 30),
-    RoomNo = 310
-};
-
-var serializer = new XmlSerializer(typeof(Patient));
-using (var writer = new StreamWriter("patients.xml"))
-{
-    serializer.Serialize(writer, patient);
-}
-*/

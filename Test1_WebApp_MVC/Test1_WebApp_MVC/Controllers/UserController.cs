@@ -17,7 +17,7 @@ namespace Test1_WebApp_MVC.Controllers
             _logger = logger;
             _dataService = new UserDataService(new XmlUserDataContext(logger));
 
-            ViewData.Upsert("activeBtn", "btnList");
+            ViewData.Reset("btnList");
         }
 
         public IActionResult Index()

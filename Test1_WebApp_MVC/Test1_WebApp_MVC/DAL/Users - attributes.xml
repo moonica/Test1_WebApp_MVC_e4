@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfUser>
+    <User Id="1" Name="Andrew" Surname="Adams" CellNumber="001" />
+    <User Id="2" Name="Bongi" Surname="Brown" CellNumber="022" />
+    <User Id="3" Name="Charles" Surname="Crawford" CellNumber="0303" />
+    <User Id="4" Name="Drienie" Surname="Diederiks" CellNumber="04444" />
+</ArrayOfUser>

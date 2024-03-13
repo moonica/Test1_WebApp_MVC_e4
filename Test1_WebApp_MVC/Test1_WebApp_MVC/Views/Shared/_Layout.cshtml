@@ -20,6 +20,20 @@
         <!-- HEADING -->
         <partial name="_Header.cshtml" />
 
+        <!-- USER MESSAGE -->
+        @if (!string.IsNullOrEmpty(ViewData?["userMsg"]?.ToString()))
+        {
+            <div class='(@ViewData?["userSuccess"] ? alert-success : alert-warning) messageBox'>
+                <label>
+                    @ViewData["userMsg"]
+                </label>
+                <label class="pull-right btn-close" onclick=""> <!-- TO DO -->
+                    X
+                </label>
+            </div>
+        }
+
+
         <!-- NAV -->
         <ul class="nav nav-tabs">
             <li id="btnAdd" class='@if (ViewData?["activeBtn"]?.ToString() == "btnAdd") {<text>active</text>}'>

@@ -17,7 +17,7 @@ namespace Test1_WebApp_MVC.Controllers
             _logger = logger;
             _dataService = new UserDataService(new XmlUserDataContext(logger));
 
-            ViewData.Upsert("activeBtn", "btnAdd");
+            ViewData.Reset("btnAdd");
         }
 
         public IActionResult Index()
@@ -40,8 +40,9 @@ namespace Test1_WebApp_MVC.Controllers
             //TODO: validation
 
             if (_dataService.CreateUser(user))
-            {                
-                return View("Index", new Response<User>() { Success = true, Message = "User Saved"});
+            {
+                ViewData.Set(true, "User created");
+                return View("Index");
             }
             else
                 return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
