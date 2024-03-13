@@ -1,0 +1,34 @@
+﻿@using Test1_WebApp_MVC.Models;
+@using Test1_WebApp_MVC.Services;
+
+@model IEnumerable<User>
+
+@if (Model is not null)
+{
+    int i = 0;
+    <div>
+        <table class="table table-bordered table-responsive table-hover">
+            <tr>
+                <th></th>
+                <th>First Name </th>
+                <th>Surname </th>
+                <th>Cellphone Number</th>
+            </tr>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@(i++)</td>
+                    <td>@user.Name</td>
+                    <td>@user.Surname</td>
+                    <td>@user.CellNumber</td>
+                </tr>
+            }
+        </table>
+    </div>
+}
+
+@if (Model is null)
+{
+   <div>No users found</div>
+}
+

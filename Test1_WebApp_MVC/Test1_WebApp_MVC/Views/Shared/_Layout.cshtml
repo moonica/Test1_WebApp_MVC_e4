@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        e4 Web Test @(string.IsNullOrEmpty(ViewData?["Title"]?.ToString()) ? "" : "|") @ViewData["Title"]
+    </title>
+    @*
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    *@
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Test1_WebApp_MVC.styles.css" asp-append-version="true" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <header>
+        <!-- HEADING -->
+        <partial name="_Header.cshtml" />
+
+        <!-- NAV -->
+        <ul class="nav nav-tabs">
+            <li id="btnAdd" class='@if (ViewData?["activeBtn"]?.ToString() == "btnAdd") {<text>active</text>}'>
+                <a data-toggle="tab" onclick="location.href='@Url.Action("Index","Home")'">
+                    Add User
+                </a>
+            </li>
+            <li id="btnList" class='@if (ViewData?["activeBtn"]?.ToString() == "btnList") {<text>active</text>}'>
+                <a data-toggle="tab" onclick="location.href='@Url.Action("Index","User")'" href="#tabList">
+                    View/Edit Users
+                </a>
+            </li>
+        </ul>
+
+    </header>
+
+    <!-- CONTENT -->
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div class="tab-content">
+                <div id="tabPane" class="tabbedContentBox">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2024 - Jonica Brown
+        </div>
+    </footer>
+    @*
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    *@
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

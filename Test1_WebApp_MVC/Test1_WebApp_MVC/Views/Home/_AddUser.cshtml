@@ -1,0 +1,42 @@
+﻿@using Test1_WebApp_MVC.Models;
+@using Test1_WebApp_MVC.Services;
+
+@model Response<User>
+
+<div>
+    @if (!string.IsNullOrEmpty(Model?.Message))
+    {
+        <div class='(@Model.Success ? alert-success : alert-warning) messageBox'>
+            <label>
+                @Model.Message
+            </label>
+            <label class="pull-right btn-close" onclick="">
+                X
+            </label>
+        </div>
+    }
+
+    @using (Html.BeginForm("CreateUser", "Home", FormMethod.Post))
+    {
+
+        <form>
+            <div class="">
+                <label for="inputName" class="col-12 col-md-2 text-right">First Name</label>
+                @Html.TextBoxFor(u => u.Data.Name, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputName", @required = "required", autofocus = "auto", @placeholder = "First Name..." })
+            </div>
+
+            <div class="">
+                <label for="inputSurname" class="col-12 col-md-2 text-right">Surname</label>
+                @Html.TextBoxFor(u => u.Data.Surname, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputSurname", @required = "required", @placeholder = "Surname..." })
+            </div>
+
+            <div class="">
+                <label for="inputCell" class="col-12 col-md-2 text-right">Cellphone Number</label>
+                @Html.TextBoxFor(u => u.Data.CellNumber, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputCell", @required = "required", @placeholder = @Utils.VALID_PHONE_EXAMPLE })
+            </div>
+
+            <button class="btn btn-lg btn-primary" type="submit">Submit</button>
+        </form>
+    }
+</div>
+
