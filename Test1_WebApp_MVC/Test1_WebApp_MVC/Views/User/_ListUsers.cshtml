@@ -8,18 +8,32 @@
     <div>
         <table class="table table-bordered table-responsive table-hover">
             <tr>
-                <th></th>
-                <th>First Name </th>
-                <th>Surname </th>
-                <th>Cellphone Number</th>
+                <th class="text-center"></th>
+                <th class="text-center">First Name </th>
+                <th class="text-center">Surname </th>
+                <th class="text-center">Cellphone Number</th>
+                <th class="text-center">Edit</th>
+                <th class="text-center">Delete</th>
+
             </tr>
             @foreach (var user in Model)
             {
                 <tr>
-                    <td>@user.Id</td>
+                    <td class="text-right">@user.Id</td>
                     <td>@user.Name</td>
                     <td>@user.Surname</td>
                     <td>@user.CellNumber</td>
+                    <td class="text-center">
+                        <span class="btn btn-info" @*onclick="location.href='@Url.Action("Index")'"*@>
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <span class="btn btn-info" onclick="confirmDelete(@user.Id, '@Url.Action("DeleteUser", new User() { Id = @user.Id })')">
+                            @*location.href='@Url.Action("DeleteUser", new User() { Id = @user.Id })'">*@
+                            <i class="fa-solid fa-trash-can"></i>
+                        </span>
+                    </td>
                 </tr>
             }
         </table>
@@ -28,7 +42,10 @@
 
 @if (Model is null)
 {
-   <div>No users found</div>
+    <div>No users found</div>
 }
 
-@* TODO: add paging *@
+@*
+    TODO: add paging
+*@
+
