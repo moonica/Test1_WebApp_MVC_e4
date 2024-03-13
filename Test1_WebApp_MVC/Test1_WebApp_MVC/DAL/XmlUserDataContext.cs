@@ -73,6 +73,12 @@ namespace Test1_WebApp_MVC.DAL
         {
             try
             {
+                XDocument xmlFile = XDocument.Load(_fileName);
+
+                xmlFile.Elements("ArrayOfUser").Elements("User").Where(elem => elem.Elements("Id").Any(i => i.Value == userIdToDelete.ToString())).Remove();                            
+
+                xmlFile.Save(_fileName);
+
                 return true;
             }
             catch (Exception ex)
@@ -127,19 +133,6 @@ namespace Test1_WebApp_MVC.DAL
 
         #region PRIVATE METHODS
 
-        private int? getMaxId(IEnumerable<XElement> query)
-        {
-            var idStrElements = query?.Select(x => x?.Element("Id")?.Value ?? "-1");
-            var idElements = new List<int>();
-            idStrElements?.ToList()?.ForEach(e =>
-            {
-                if (int.TryParse(e, out int id))
-                    idElements.Add(id);
-            });
-
-            return idElements?.Max();
-        }
-
         private int? getMaxId()
         {
             var users = GetUsers();
@@ -171,21 +164,6 @@ namespace Test1_WebApp_MVC.DAL
                 _logger.LogError(ex.Message);
                 return false;
             }
-        }
-
-        private void populateNode(XElement userNode, User newUser, bool coalesce = false)
-        {
-            if ((userNode == null) || (newUser == null))
-                return;
-
-            populateNodeAttribute(userNode, newUser.Name, "Name", coalesce);
-            populateNodeAttribute(userNode, newUser.Surname, "Surname", coalesce);
-            populateNodeAttribute(userNode, newUser.CellNumber, "CellNumber", coalesce);
-        }
-
-        private void populateNodeAttribute(XElement userNode, string newValue, string attrName, bool coalesce = false)
-        {
-            userNode.Attribute(attrName).Value = coalesce ? (newValue ?? userNode.Attribute(attrName).Value) : newValue;
         }
 
         private XElement getUserXElement(User newUser, int id)
