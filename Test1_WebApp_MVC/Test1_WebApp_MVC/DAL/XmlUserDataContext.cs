@@ -7,18 +7,36 @@ namespace Test1_WebApp_MVC.DAL
 {
     public class XmlUserDataContext : IUserDataContext
     {
-        private readonly string _fileName = @"DAL/Users.xml"; //TODO: store in config
+        private string _filePath = @"DAL/Users.xml"; //TODO: store in config
         private ILogger _logger;
         
         public string ErrorMessage = string.Empty;
 
+        /// <summary>
+        /// Construct a new instance of XmlUserDataContext, using the preconfigured file path
+        /// </summary>
+        /// <param name="logger">Logging mechanism</param>
         public XmlUserDataContext(ILogger logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Construct a new instance of XmlUserDataContext
+        /// </summary>
+        /// <param name="filePath">Specify relative path to XML file</param>
+        /// <param name="logger">Logging mechanism</param>
+        public XmlUserDataContext(string filePath,  ILogger logger)
+        {
+            _filePath = filePath;
+            _logger = logger;
+        }
+
         #region PUBLIC METHODS
 
+        /// <summary>
+        /// Add a new user node to the end of the ArrayOfUsers node in the XML file
+        /// </summary>
         public bool CreateUser(User newUser)
         {
             try
@@ -28,13 +46,13 @@ namespace Test1_WebApp_MVC.DAL
 
                 var nextId = (getMaxId() ?? -1) + 1;
 
-                XDocument xmlFile = XDocument.Load(_fileName);
+                XDocument xmlFile = XDocument.Load(_filePath);
                 newUser.Id = nextId;
                 var newElem = getXElementFromUser(newUser);
 
                 xmlFile?.Element("ArrayOfUser")?.LastNode?.AddAfterSelf(newElem);
 
-                xmlFile.Save(_fileName);
+                xmlFile.Save(_filePath);
 
                 return true;
             }
@@ -45,6 +63,9 @@ namespace Test1_WebApp_MVC.DAL
             }
         }
 
+        /// <summary>
+        /// Update an existing user with the given properties. Blank fields will overwrite existing fields
+        /// </summary>
         public bool UpdateUser(User existingUser)
         {
             if ((existingUser is null) || (existingUser.Id <= 0))
@@ -52,7 +73,7 @@ namespace Test1_WebApp_MVC.DAL
 
             try
             {
-                XDocument xmlFile = XDocument.Load(_fileName);
+                XDocument xmlFile = XDocument.Load(_filePath);
 
                 var elemToUpdate = xmlFile
                     .Elements("ArrayOfUser")
@@ -64,9 +85,11 @@ namespace Test1_WebApp_MVC.DAL
                     return false;
 
                 var newElem = getXElementFromUser(existingUser);//, elemToUpdate);
+                //enable the second parameter to coalesce, ie not overwrite with blanks
+
                 elemToUpdate.ReplaceWith(newElem);
 
-                xmlFile.Save(_fileName);
+                xmlFile.Save(_filePath);
 
                 return true;
             }
@@ -77,18 +100,25 @@ namespace Test1_WebApp_MVC.DAL
             }
         }
 
+        /// <summary>
+        /// Delete a user node from the XML path using the given ID
+        /// </summary>
         public bool DeleteUser(int userIdToDelete)
         {
             try
             {
-                XDocument xmlFile = XDocument.Load(_fileName);
+                XDocument xmlFile = XDocument.Load(_filePath);
 
-                xmlFile.Elements("ArrayOfUser")
+                var elemToDelete = xmlFile.Elements("ArrayOfUser")
                     .Elements("User")
-                    .Where(elem => elem.Elements("Id").Any(i => i.Value == userIdToDelete.ToString()))
-                    .Remove();                            
+                    .Where(elem => elem.Elements("Id").Any(i => i.Value == userIdToDelete.ToString()));
 
-                xmlFile.Save(_fileName);
+                if (elemToDelete == null)
+                    return false;
+
+                elemToDelete.Remove();                            
+
+                xmlFile.Save(_filePath);
 
                 return true;
             }
@@ -99,19 +129,27 @@ namespace Test1_WebApp_MVC.DAL
             }
         }
 
+        /// <summary>
+        /// Get a specific user by ID
+        /// </summary>
+        /// <param name="userId"></param>
         public User GetUser(int userId)
         {
-            try
-            {
-                return new User();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex.Message);
-                return null;
-            }
+            //try
+            //{
+            //    return new User();
+            //}
+            //catch (Exception ex)
+            //{
+            //    _logger.LogError(ex.Message);
+            //    return null;
+            //}
+            throw new NotImplementedException();
         }
 
+        /// <summary>
+        /// Get all users from the XML file as a list of User objects
+        /// </summary>        
         public List<User> GetUsers()
         {
             try
@@ -119,7 +157,7 @@ namespace Test1_WebApp_MVC.DAL
                 var result = new List<User>();
 
                 var serializer = new XmlSerializer(typeof(User[]));
-                using (var reader = new StreamReader(_fileName))
+                using (var reader = new StreamReader(_filePath))
                 {
                     var xmlResult = serializer.Deserialize(reader);
 
@@ -152,7 +190,7 @@ namespace Test1_WebApp_MVC.DAL
 
         private bool validateUser(User newUser)
         {
-            return true;
+            return newUser?.IsValid() ?? false;
         }
 
         private bool createFirstUser(User newUser)
@@ -163,7 +201,7 @@ namespace Test1_WebApp_MVC.DAL
                     return false;
 
                 var serializer = new XmlSerializer(typeof(User));
-                using (var writer = new StreamWriter(_fileName))
+                using (var writer = new StreamWriter(_filePath))
                 {
                     serializer.Serialize(writer, newUser);
                 }
