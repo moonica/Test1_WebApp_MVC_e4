@@ -2,13 +2,11 @@
 e4 Tech Assessment Test 1 - Web App
 
 # Assumptions
-The XML file exists already, in the current location on disk
+- The XML file exists already, in the current location on disk
+- The @Html helper's sanitizing of form inputs is sufficient
 
 # TO DO
-- Validation of user input
-- Antiforgery tokens and input sanitizing
+- Client side validation of user input (server side is implemented, although I am not satisfied with the regex pattern)
+- Antiforgery tokens
 - Unit tests
-- Complete outstanding CRUD operations (Return (by ID), Update, Delete)
-- Troubleshoot Create operation
-- User message on User page also
-- Disappearing user messages
+- Disappearing user messages (using timeouts or similar, similar to toast)
