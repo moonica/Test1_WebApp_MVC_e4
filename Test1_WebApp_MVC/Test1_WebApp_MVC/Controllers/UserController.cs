@@ -24,46 +24,57 @@ namespace Test1_WebApp_MVC.Controllers
 
         public IActionResult Index()
         {
-            var vm = new UserViewModel<List<User>>(this.GetType().ToString()) { ActionName = "ListUsers", ControllerName = "User" };
+            try
+            {
+                var vm = new UserViewModel<List<User>>(this.GetType().ToString()) { ActionName = "ListUsers", ControllerName = "User" };
 
-            ViewData.Upsert("activeBtn", "btnList");
+                ViewData.Upsert("activeBtn", "btnList");
 
-            vm.UserData = _dataService.GetUsers();
+                vm.UserData = _dataService.GetUsers();
 
-            return View("Index", vm);
+                return View("Index", vm);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Could not list users", ex);
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            }
+
         }
 
         public ActionResult DeleteUser(User user)
         {
-            if ((user?.Id ?? -1) < 0)
+            try
             {
-                var msg = "Unable to delete user, no user ID received";
-                _logger.LogWarning(msg);
-                ViewData.Upsert("userMsg", msg);
-                ViewData.Upsert("userSuccess", false);
+                if ((user?.Id ?? -1) < 0)
+                {
+                    var msg = "Unable to delete user, no user ID received";
+                    _logger.LogWarning(msg);
+                    ViewData.SetState(false, msg);
 
-                return View("Index");
+                    return View("Index");
+                }
+
+                _logger.LogInformation("Deleting user " + user?.Id);
+                //TODO: if we had authentication, we would record who performed the delete for traceability/auditing            
+
+                if (_dataService.DeleteUser(user.Id))
+                    ViewData.SetState(true, $"User {user.Id} deleted");
+                else
+                    ViewData.SetState(false, $"User {user.Id} could not be deleted");
+
+                //TODO: keep users in memory (Viewdata?) to avoid refetching. This is cheap enough for an XML file but not for db calls e.g.
+                var users = _dataService.GetUsers();
+
+                return View("Index", new UserViewModel<List<User>>() { UserData = users, ActionName = "ListUsers", ControllerName = "User" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Could not delete user", ex);
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
 
-            _logger.LogInformation("Deleting user " + user?.Id);
-            //TODO: if we had authentication, we would record who performed the delete for traceability/auditing            
-
-            if (_dataService.DeleteUser(user.Id))
-            {
-                ViewData.Upsert("userMsg", $"User {user.Id} deleted");
-                ViewData.Upsert("userSuccess", true);
-            }
-            else
-            {
-                ViewData.Upsert("userMsg", $"User {user.Id} could not be deleted");
-                ViewData.Upsert("userSuccess", false);
-            }
-
-            //TODO: keep users in memory (Viewdata?) to avoid refetching. This is cheap enough for an XML file but not for db calls e.g.
-            var users = _dataService.GetUsers();
-
-            return View("Index", new UserViewModel<List<User>>() { UserData = users, ActionName = "ListUsers", ControllerName = "User" });
-        }        
+        }
 
         public ActionResult EditUser(User user)
         {
@@ -72,18 +83,47 @@ namespace Test1_WebApp_MVC.Controllers
 
         public ActionResult UpdateUser(UserViewModel<User> userViewModel)
         {
-            //TODO: validation
+            try
+            {
+                var userToUpdate = userViewModel?.UserData;
 
-            if (_dataService.UpdateUser(userViewModel.UserData))
-            {
-                ViewData.Set(true, "User Updated");
-                return View("Index", new UserViewModel<List<User>>(this.GetType().ToString()) { UserData =_dataService.GetUsers(), ActionName = "ListUsers", ControllerName = "User" });
+                if (userToUpdate?.Id is null)
+                {
+                    ViewData.SetState(false, "No valid user data received for delete request");
+                    return View("Index");
+                }
+
+                //ASSUMPTION: inputs are sanitized already by the @Html helper class
+                if (!userToUpdate.IsValid())
+                {
+                    ViewData.SetState(false, $"Invalid user update input. {userToUpdate.ValidationErrors.Flatten(". ")}");
+                    return View("Index");
+                }
+
+                if (_dataService.UpdateUser(userToUpdate))
+                {
+                    ViewData.SetState(true, "User Updated");
+                    return View("Index", new UserViewModel<List<User>>(this.GetType().ToString()) { UserData = _dataService.GetUsers(), ActionName = "ListUsers", ControllerName = "User" });
+                }
+                else
+                {
+                    _logger.LogWarning("Could not update user", userToUpdate);
+                    ViewData.SetState(false, "Unexpected failure updating user");
+                    return View("Index", new UserViewModel<List<User>>(this.GetType().ToString()) { ActionName = "ListUsers", ControllerName = "User" });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogWarning("Could not update user", userViewModel.UserData);
+                _logger.LogError("Could not update user", ex);
                 return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
+        }
+
+        public IActionResult Reset()
+        {
+            ViewData.Reset("btnList");
+
+            return View("Index", new UserViewModel<List<User>>(this.GetType().ToString()) { UserData = _dataService.GetUsers(), ActionName = "ListUsers", ControllerName = "User" });
         }
     }
 }

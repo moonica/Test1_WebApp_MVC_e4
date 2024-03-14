@@ -3,6 +3,7 @@
 
 @model UserViewModel<User>
 
+@*     
     actionName: @Model.ActionName </br>
     controllerName: @Model.ControllerName </br>
     sender: @Model.Sender </br>
@@ -11,6 +12,7 @@
     &nbsp; Name: @(Model.UserData?.Name ?? "null") <br />
     &nbsp; Surname: @(Model.UserData?.Surname ?? "null") <br />
     &nbsp; CellNumber: @(Model.UserData?.CellNumber ?? "null") <br />
+ *@
 
 <div>
     @using (Html.BeginForm(Model.ActionName, Model.ControllerName, FormMethod.Post))

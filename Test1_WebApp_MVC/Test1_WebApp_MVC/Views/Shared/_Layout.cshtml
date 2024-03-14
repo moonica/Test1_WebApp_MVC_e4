@@ -24,18 +24,24 @@
 </head>
 <body>
     <header>
+        @{ 
+            bool userSuccess = false;
+            bool.TryParse(ViewData?["userSuccess"]?.ToString(), out userSuccess);
+        }
+
         <!-- HEADING -->
         <partial name="_Header.cshtml" />
 
         <!-- USER MESSAGE -->
         @if (!string.IsNullOrEmpty(ViewData?["userMsg"]?.ToString()))
         {
-            <div class='(@ViewData?["userSuccess"] ? alert-success : alert-warning) messageBox'>
+            <div class='@(userSuccess ? "alert-success" : "alert-warning") messageBox'>
                 <label>
                     @ViewData["userMsg"]
                 </label>
-                <label class="pull-right btn btn-close btn-toast" onclick="location.href='@Url.Action("Index")'">
+                <label class="pull-right btn btn-close btn-toast" onclick="location.href='@Url.Action("Reset")'">
                     <!-- Navigating back to Index calls the constructor, which resets the ViewData for success and user message -->
+                    <!-- TODO: this is not desired behaviour for edit/add user validation failure, it removes the input from the boxes -->
                     X
                 </label>
             </div>
