@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 using Test1_WebApp_MVC.Models.Interfaces;
 using Test1_WebApp_MVC.Services;
 
@@ -14,7 +15,7 @@ namespace Test1_WebApp_MVC.Models
 
         public bool IsValid()
         {
-            var result = 
+            var result =
                 isNotEmptyString(this.Name, nameof(this.Name))
                 && isNotEmptyString(this.Surname, nameof(this.Surname))
                 && isNotEmptyString(this.CellNumber, nameof(this.CellNumber))
@@ -27,18 +28,20 @@ namespace Test1_WebApp_MVC.Models
         {
             if (string.IsNullOrEmpty(str?.Trim()))
             {
-                ValidationErrors.NewOrCurrent().Add($"String '{fieldName}' is a required field");
+                ValidationErrors = ValidationErrors.NewOrCurrent();
+                ValidationErrors.Add($"String '{fieldName}' is a required field");
                 return false;
             }
 
-            return true;            
+            return true;
         }
 
         private bool isValidCellNr(string str, string fieldName)
         {
             if (!Utils.MatchesPhoneRegex(str))
             {
-                ValidationErrors.NewOrCurrent().Add($"Field '{fieldName}' does not contain a valid phone number ({Utils.VALID_PHONE_EXAMPLE})");
+                ValidationErrors = ValidationErrors.NewOrCurrent();
+                ValidationErrors.Add($"Field '{fieldName}' does not contain a valid phone number ({Utils.VALID_PHONE_EXAMPLE})");
                 return false;
             }
 
