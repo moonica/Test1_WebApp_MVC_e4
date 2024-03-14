@@ -41,3 +41,8 @@ body {
 .btn-toast {
     padding: 0;
 }
+
+.textBoxRow {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+}

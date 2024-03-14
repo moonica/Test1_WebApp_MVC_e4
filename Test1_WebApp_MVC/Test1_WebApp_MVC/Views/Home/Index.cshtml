@@ -6,5 +6,5 @@
 
 <h3>Add New User</h3>
 <div id="tabAdd" class="tab-pane fade in active">
-    <partial name="_EditUser.cshtml" model='new UserViewModel() { user = Model, actionName = "CreateUser", controllerName = "Home" }' />
+    <partial name="../Shared/_EditUser.cshtml" model='new UserViewModel<User>("Home.Index.cshtml") { UserData = Model, ActionName = "CreateUser", ControllerName = "Home" }' />
 </div>

@@ -4,18 +4,25 @@
 
 @model UserViewModel<List<User>>
 
-@if (Model.actionName == "ListUsers")
+@* 
+    actionName: @Model.ActionName </br>
+    controllerName: @Model.ControllerName </br>
+    sender: @Model.Sender </br>
+    List of users: @(Model.UserData?.Count.ToString() ?? "null") </br> 
+*@
+
+@if (Model.ActionName == "ListUsers")
 {
     <h3>List of Users</h3>
     <div id="tabList" class="tab-pane fade in active">
-        <partial name="_ListUsers.cshtml" model="Model?.userData"/>
+        <partial name="_ListUsers.cshtml" model="Model?.UserData"/>
     </div>
 }
 
-@if (Model.actionName == "EditUser")
+@if (Model.ActionName == "EditUser")
 {
     <h3>Edit User</h3>
     <div id="tabList" class="tab-pane fade in active">
-        <partial name="_EditUser.cshtml" model='new UserViewModel<User>() { userData = Model?.userData?.FirstOrDefault(), actionName = "UpdateUser", controllerName = "User" }'/>
+        <partial name="../Shared/_EditUser.cshtml" model='new UserViewModel<User>("User.Index.cshtml") { UserData = Model?.UserData?.FirstOrDefault(), ActionName = "UpdateUser", ControllerName = "User" }' />
     </div>
 }

@@ -7,8 +7,10 @@ namespace Test1_WebApp_MVC.DAL
 {
     public class XmlUserDataContext : IUserDataContext
     {
-        private readonly string _fileName = @"DAL/Users.xml";
+        private readonly string _fileName = @"DAL/Users.xml"; //TODO: store in config
         private ILogger _logger;
+        
+        public string ErrorMessage = string.Empty;
 
         public XmlUserDataContext(ILogger logger)
         {
@@ -27,7 +29,8 @@ namespace Test1_WebApp_MVC.DAL
                 var nextId = (getMaxId() ?? -1) + 1;
 
                 XDocument xmlFile = XDocument.Load(_fileName);
-                var newElem = getUserXElement(newUser, nextId);
+                newUser.Id = nextId;
+                var newElem = getXElementFromUser(newUser);
 
                 xmlFile?.Element("ArrayOfUser")?.LastNode?.AddAfterSelf(newElem);
 
@@ -44,29 +47,34 @@ namespace Test1_WebApp_MVC.DAL
 
         public bool UpdateUser(User existingUser)
         {
-            //try
-            //{
-            //    if (!validateUser(existingUser))
-            //        return false;
+            if ((existingUser is null) || (existingUser.Id <= 0))
+                return false;
 
-            //    XDocument xmlFile = XDocument.Load(_fileName);
-            //    var query = from c in xmlFile.Elements("ArrayOfUser").Elements("User").Where(x => x.Attribute("Id")?.ToString() == existingUser.Id.ToString())
-            //                select c;
-            //    foreach (XElement userNode in query)
-            //    {
-            //        if (userNode == null)
-            //            continue;
+            try
+            {
+                XDocument xmlFile = XDocument.Load(_fileName);
 
-            //        populateNode(userNode, existingUser, true);
-            //    }
-            //    xmlFile.Save(_fileName);
+                var elemToUpdate = xmlFile
+                    .Elements("ArrayOfUser")
+                    .Elements("User")
+                    .Where(elem => elem.Elements("Id").Any(i => i.Value == existingUser?.Id.ToString()))
+                    .FirstOrDefault();
+
+                if (elemToUpdate is null)
+                    return false;
+
+                var newElem = getXElementFromUser(existingUser);//, elemToUpdate);
+                elemToUpdate.ReplaceWith(newElem);
+
+                xmlFile.Save(_fileName);
+
                 return true;
-            //}
-            //catch (Exception ex)
-            //{
-            //    _logger.LogError(ex.Message);
-            //    return false;
-            //}
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message);
+                return false;
+            }
         }
 
         public bool DeleteUser(int userIdToDelete)
@@ -75,7 +83,10 @@ namespace Test1_WebApp_MVC.DAL
             {
                 XDocument xmlFile = XDocument.Load(_fileName);
 
-                xmlFile.Elements("ArrayOfUser").Elements("User").Where(elem => elem.Elements("Id").Any(i => i.Value == userIdToDelete.ToString())).Remove();                            
+                xmlFile.Elements("ArrayOfUser")
+                    .Elements("User")
+                    .Where(elem => elem.Elements("Id").Any(i => i.Value == userIdToDelete.ToString()))
+                    .Remove();                            
 
                 xmlFile.Save(_fileName);
 
@@ -166,14 +177,41 @@ namespace Test1_WebApp_MVC.DAL
             }
         }
 
-        private XElement getUserXElement(User newUser, int id)
+        /// <summary>
+        /// Converts a "User" XML element to a User object. If an existing element is provided, the values (except ID) are coalsesced (the new value is used if present, else the existing value is defaulted to)
+        /// </summary>
+        /// <param name="userNewValues"></param>
+        /// <param name="existingElement"></param>
+        /// <returns></returns>
+        private XElement getXElementFromUser(User userNewValues, XElement existingElement = null)
         {
+            var existingUser = getUserFromXElement(existingElement);
+
             return new XElement("User",
-                new XElement(nameof(newUser.Id), id),
-                new XElement(nameof(newUser.Name), newUser.Name),
-                new XElement(nameof(newUser.Surname), newUser.Surname),
-                new XElement(nameof(newUser.CellNumber), newUser.CellNumber)
+                new XElement(nameof(userNewValues.Id), userNewValues.Id),
+                new XElement(nameof(userNewValues.Name), coalesce(userNewValues.Name, existingUser?.Name)),
+                new XElement(nameof(userNewValues.Surname), coalesce(userNewValues.Surname, existingUser?.Surname)),
+                new XElement(nameof(userNewValues.CellNumber), coalesce(userNewValues.CellNumber, existingUser?.CellNumber))
             );
+        }
+
+        private string coalesce(string preferredValue, string fallbackValue)
+        {
+            return (string.IsNullOrEmpty(preferredValue?.Trim()) ? (fallbackValue ?? string.Empty) : preferredValue);
+        }
+
+        private User getUserFromXElement(XElement existingElement)
+        {
+            var result = new User();
+
+            if (existingElement is null)
+               return null;
+
+            result.Name = existingElement.Element(nameof(result.Name)).Value;
+            result.Surname = existingElement.Element(nameof(result.Surname)).Value;
+            result.CellNumber = existingElement.Element(nameof(result.CellNumber)).Value;
+
+            return result;
         }
 
         #endregion PRIVATE METHODS

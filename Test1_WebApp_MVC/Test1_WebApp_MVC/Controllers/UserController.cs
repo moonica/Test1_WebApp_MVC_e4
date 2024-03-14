@@ -22,25 +22,20 @@ namespace Test1_WebApp_MVC.Controllers
             ViewData.Reset("btnList");
         }
 
-        public IActionResult Index(string userAction = null)
+        public IActionResult Index()
         {
-            var vm = new UserViewModel<List<User>>() { actionName = userAction };
+            var vm = new UserViewModel<List<User>>(this.GetType().ToString()) { ActionName = "ListUsers", ControllerName = "User" };
 
-            if ((userAction ?? "ListUsers") == "ListUsers")
-            {
-                ViewData.Upsert("activeBtn", "btnList");
+            ViewData.Upsert("activeBtn", "btnList");
 
-                vm.userData = _dataService.GetUsers();
+            vm.UserData = _dataService.GetUsers();
 
-                return View("Index", vm);
-            }
-
-            return View("Index");
+            return View("Index", vm);
         }
 
-        public ActionResult DeleteUser(User userToDelete)
+        public ActionResult DeleteUser(User user)
         {
-            if ((userToDelete?.Id ?? -1) < 0)
+            if ((user?.Id ?? -1) < 0)
             {
                 var msg = "Unable to delete user, no user ID received";
                 _logger.LogWarning(msg);
@@ -50,39 +45,44 @@ namespace Test1_WebApp_MVC.Controllers
                 return View("Index");
             }
 
-            _logger.LogInformation("Deleting user " + userToDelete?.Id);
+            _logger.LogInformation("Deleting user " + user?.Id);
             //TODO: if we had authentication, we would record who performed the delete for traceability/auditing            
 
-            if (_dataService.DeleteUser(userToDelete.Id))
+            if (_dataService.DeleteUser(user.Id))
             {
-                ViewData.Upsert("userMsg", $"User {userToDelete.Id} deleted");
+                ViewData.Upsert("userMsg", $"User {user.Id} deleted");
                 ViewData.Upsert("userSuccess", true);
             }
             else
             {
-                ViewData.Upsert("userMsg", $"User {userToDelete.Id} could not be deleted");
+                ViewData.Upsert("userMsg", $"User {user.Id} could not be deleted");
                 ViewData.Upsert("userSuccess", false);
             }
 
             //TODO: keep users in memory (Viewdata?) to avoid refetching. This is cheap enough for an XML file but not for db calls e.g.
             var users = _dataService.GetUsers();
 
-            return View("Index", users);
-        }
+            return View("Index", new UserViewModel<List<User>>() { UserData = users, ActionName = "ListUsers", ControllerName = "User" });
+        }        
 
         public ActionResult EditUser(User user)
         {
+            return View("Index", new UserViewModel<List<User>>() { ActionName = "EditUser", UserData = new List<User>() { user } });
+        }
+
+        public ActionResult UpdateUser(UserViewModel<User> userViewModel)
+        {
             //TODO: validation
 
-            if (_dataService.UpdateUser(user))
+            if (_dataService.UpdateUser(userViewModel.UserData))
             {
                 ViewData.Set(true, "User Updated");
-                return View("Index");
+                return View("Index", new UserViewModel<List<User>>(this.GetType().ToString()) { UserData =_dataService.GetUsers(), ActionName = "ListUsers", ControllerName = "User" });
             }
             else
             {
-                _logger.LogWarning("Could not update user", user);
-                return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                _logger.LogWarning("Could not update user", userViewModel.UserData);
+                return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
             }
         }
     }

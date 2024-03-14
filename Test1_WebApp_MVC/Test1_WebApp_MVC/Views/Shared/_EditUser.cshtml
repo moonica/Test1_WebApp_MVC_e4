@@ -3,26 +3,36 @@
 
 @model UserViewModel<User>
 
+    actionName: @Model.ActionName </br>
+    controllerName: @Model.ControllerName </br>
+    sender: @Model.Sender </br>
+    user: <br />
+    &nbsp; Id: @(Model.UserData?.Id.ToString() ?? "null") </br>
+    &nbsp; Name: @(Model.UserData?.Name ?? "null") <br />
+    &nbsp; Surname: @(Model.UserData?.Surname ?? "null") <br />
+    &nbsp; CellNumber: @(Model.UserData?.CellNumber ?? "null") <br />
+
 <div>
-    @using (Html.BeginForm(Model.actionName, Model.controllerName, FormMethod.Post))
+    @using (Html.BeginForm(Model.ActionName, Model.ControllerName, FormMethod.Post))
     {
         <form>
-            <div class="">
-                <label for="inputName" class="col-12 col-md-2 text-right">First Name</label>
-                @Html.TextBoxFor(u => u.userData.Name, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputName", @required = "required", autofocus = "auto", @placeholder = "First Name..." })
+            <div class="textBoxRow">
+                <label for="inputName" class="col-12 col-md-3 text-right">First Name</label>
+                @Html.TextBoxFor(u => u.UserData.Name, htmlAttributes: new { @class = "col-12 col-md-9", @id = "inputName", @required = "required", autofocus = "auto", @placeholder = "First Name..." })
             </div>
 
-            <div class="">
-                <label for="inputSurname" class="col-12 col-md-2 text-right">Surname</label>
-                @Html.TextBoxFor(u => u.userData.Surname, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputSurname", @required = "required", @placeholder = "Surname..." })
+            <div class="textBoxRow">
+                <label for="inputSurname" class="col-12 col-md-3 text-right">Surname</label>
+                @Html.TextBoxFor(u => u.UserData.Surname, htmlAttributes: new { @class = "col-12 col-md-9", @id = "inputSurname", @required = "required", @placeholder = "Surname..." })
             </div>
 
-            <div class="">
-                <label for="inputCell" class="col-12 col-md-2 text-right">Cellphone Number</label>
-                @Html.TextBoxFor(u => u.userData.CellNumber, htmlAttributes: new { @class = "col-12 col-md-10", @id = "inputCell", @required = "required", @placeholder = @Utils.VALID_PHONE_EXAMPLE })
+            <div class="textBoxRow">
+                <label for="inputCell" class="col-12 col-md-3 text-right">Cellphone Number</label>
+                @Html.TextBoxFor(u => u.UserData.CellNumber, htmlAttributes: new { @class = "col-12 col-md-9", @id = "inputCell", @required = "required", @placeholder = @Utils.VALID_PHONE_EXAMPLE })
             </div>
 
-            <button class="btn btn-primary pull-right" type="submit">Submit</button>
+            @Html.HiddenFor(u => u.UserData.Id)
+            <button class="btn btn-primary col-md-offset-11" type="submit">Submit</button>            
         </form>
     }
 </div>
