@@ -8,5 +8,7 @@ e4 Tech Assessment Test 1 - Web App
 # TO DO
 - Client side validation of user input (server side is implemented, although I am not satisfied with the regex pattern)
 - Antiforgery tokens
-- Unit tests
+- Unit tests (a sample was created to demonstrate general approach)
 - Disappearing user messages (using timeouts or similar, similar to toast)
+- Need to add summary style comments on public classes, properties, methods
+- Highlight and scroll to a newly edited record
